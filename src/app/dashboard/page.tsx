@@ -1,34 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function Dashboard() {
-    const router = useRouter();
-    const [loggingOut, setLoggingOut] = useState(false);
-
-    const handleLogout = async () => {
-        setLoggingOut(true);
-
-        // Optionally notify server-side session/logout endpoint if you have one.
-        // If you don't have an API route, the fetch will fail silently.
-        try {
-            await fetch("/api/logout", { method: "POST", credentials: "include" }).catch(()=>{});
-        } finally {
-            // Clear any client-side auth state (adjust keys to your app)
-            if (typeof window !== "undefined") {
-                localStorage.removeItem("authToken");
-                sessionStorage.removeItem("authToken");
-                // clear other user data if needed
-            }
-
-            // Redirect to sign-in page
-            router.push("/sign-in");
-            setLoggingOut(false);
-        }
-    };
-
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-neutral-900">
             {/* Header */}
@@ -53,13 +25,6 @@ export default function Dashboard() {
                         </button>
                         <button className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700">
                             👤
-                        </button>
-                        <button
-                            onClick={handleLogout}
-                            disabled={loggingOut}
-                            className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 disabled:opacity-60"
-                        >
-                            {loggingOut ? "Logging out..." : "Log Out"}
                         </button>
                     </div>
                 </div>
