@@ -3,14 +3,14 @@ import type { LoginPayload, RegisterPayload, AuthResponse, UserProfile } from ".
 
 export const authService = {
   async login(data: LoginPayload): Promise<AuthResponse> {
-    return request<AuthResponse>("/sign-in", {
+    return request<AuthResponse>("/pages/sign-in", {
       method: "POST",
       body: data,
     });
   },
 
   async register(data: RegisterPayload): Promise<AuthResponse> {
-    return request<AuthResponse>("/sign-up", {
+    return request<AuthResponse>("//pagessign-up", {
       method: "POST",
       body: data,
     });

@@ -17,10 +17,10 @@ export default function Home() {
                     <Link href="#about" className="hover:underline">
                         About
                     </Link>
-                    <Link href="/sign-in" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
+                    <Link href="/pages/sign-in" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
                         Sign in
                     </Link>
-                    <Link href="/sign-up" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
+                    <Link href="/pages/sign-up" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
                         Sign up
                     </Link>
                 </nav>
@@ -38,7 +38,7 @@ export default function Home() {
                             Visualize your workflow with boards, lists, and cards — just like Trello.
                         </p>
                         <div className="flex gap-4 flex-wrap">
-                            <Link href="/sign-up" className="px-6 py-3 bg-foreground text-background rounded-md font-medium hover:opacity-90">
+                            <Link href="/../sign-up" className="px-6 py-3 bg-foreground text-background rounded-md font-medium hover:opacity-90">
                                 Get Started Free
                             </Link>
                             <Link href="#features" className="px-6 py-3 border rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800">

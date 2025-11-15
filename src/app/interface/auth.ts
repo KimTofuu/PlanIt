@@ -4,7 +4,8 @@ export interface LoginPayload {
 }
 
 export interface RegisterPayload {
-  name: string;
+  fName: string;
+  lName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -14,13 +15,15 @@ export interface AuthResponse {
   token: string;
   user: {
     id: string;
-    name: string;
+    fName: string;
+    lName: string;
     email: string;
   };
 }
 
 export interface UserProfile {
   id: string;
-  name: string;
+  fName: string;
+  lName: string;
   email: string;
 }

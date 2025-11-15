@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { authService } from "../services/authService";
-import type { AuthResponse, UserProfile, LoginPayload, RegisterPayload } from "../interface/auth";
+import { LoginPayload, RegisterPayload, UserProfile } from "../interface/auth";
 
 const TOKEN_KEY = "auth_token";
 
@@ -16,29 +15,53 @@ export function useAuth() {
   const fetchProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const data = await authService.getProfile(token);
-      setUser(data);
-    } catch {
-      logout();
+      const res = await fetch("/api/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      } else {
+        localStorage.removeItem(TOKEN_KEY);
+        setUser(null);
+      }
+    } catch (err) {
+      console.error("Failed to fetch profile:", err);
+      localStorage.removeItem(TOKEN_KEY);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
   }, [token]);
 
   useEffect(() => {
     if (token) {
-      fetchProfile().finally(() => setLoading(false));
+      fetchProfile();
     } else {
       setLoading(false);
     }
   }, [fetchProfile, token]);
 
   const login = async (payload: LoginPayload) => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      const res = await authService.login(payload);
-      localStorage.setItem(TOKEN_KEY, res.token);
-      setUser(res.user);
-      setError(null);
-      return res;
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data?.error || "Login failed");
+        throw new Error(data?.error || "Login failed");
+      }
+
+      localStorage.setItem(TOKEN_KEY, data.token);
+      setUser(data.user);
+      return data;
     } catch (err: any) {
       setError(err.message || "Login failed");
       throw err;
@@ -57,21 +80,38 @@ export function useAuth() {
       throw new Error("Passwords do not match");
     }
 
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: payload.name, email: payload.email, password: payload.password }),
-    });
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          fName: payload.fName, 
+          lName: payload.lName, 
+          email: payload.email, 
+          password: payload.password 
+        }),
+      });
 
-    const data = await res.json();
-    setLoading(false);
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data?.error || "Registration failed");
-      throw new Error(data?.error || "Registration failed");
+      if (!res.ok) {
+        setError(data?.error || "Registration failed");
+        throw new Error(data?.error || "Registration failed");
+      }
+
+      // Auto-login after successful registration
+      if (data.token) {
+        localStorage.setItem(TOKEN_KEY, data.token);
+        setUser(data.user);
+      }
+
+      return data;
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+      throw err;
+    } finally {
+      setLoading(false);
     }
-
-    return data;
   };
 
   const logout = () => {

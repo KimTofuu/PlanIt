@@ -24,7 +24,7 @@ export default function Dashboard() {
             }
 
             // Redirect to sign-in page
-            router.push("/sign-in");
+            router.push("/pages/sign-in");
             setLoggingOut(false);
         }
     };

@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import clientPromise from "../../../lib/mongodb";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { fName, lName, email, password } = await req.json();
 
-    if (!name || !email || !password) {
+    if (!fName || !lName || !email || !password) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
@@ -24,13 +25,33 @@ export async function POST(req: Request) {
 
     const hashed = await bcrypt.hash(password, 10);
     const result = await users.insertOne({
-      name,
+      fName,
+      lName,
       email,
       password: hashed,
       createdAt: new Date(),
     });
 
-    return NextResponse.json({ ok: true, id: result.insertedId.toString() }, { status: 201 });
+    // Generate JWT token for auto-login
+    const token = jwt.sign(
+      { userId: result.insertedId.toString(), email },
+      process.env.JWT_SECRET || "fallback-secret-change-in-production",
+      { expiresIn: "7d" }
+    );
+
+    return NextResponse.json(
+      {
+        ok: true,
+        token,
+        user: {
+          id: result.insertedId.toString(),
+          fName,
+          lName,
+          email,
+        },
+      },
+      { status: 201 }
+    );
   } catch (err: any) {
     console.error("Register error:", err);
     return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
