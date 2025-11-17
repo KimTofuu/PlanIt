@@ -1,6 +1,7 @@
 import React from "react";
 import Field from "../Atoms/Fields";
 import Button from "../Atoms/Buttons";
+import type { LoginPayload, RegisterPayload } from "../../interface/auth";
 
 interface FormFieldConfig {
   name: string;
@@ -70,13 +71,13 @@ export function Form({
 
 // Login Form Component
 interface LoginFormProps {
-  onSubmit: (data: { email: string; password: string }) => Promise<void>;
+  onSubmit: (data: LoginPayload) => Promise<void>;
   isLoading?: boolean;
-  error?: string;
+  error?: string | null;
 }
 
 export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
-  const [values, setValues] = React.useState({
+  const [values, setValues] = React.useState<LoginPayload>({
     email: "",
     password: "",
   });
@@ -121,15 +122,9 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
 
 // Register Form Component
 interface RegisterFormProps {
-  onSubmit: (data: {
-    fName: string;
-    lName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) => Promise<void>;
+  onSubmit: (data: RegisterPayload) => Promise<void>;
   isLoading?: boolean;
-  error?: string;
+  error?: string | null;
 }
 
 export function RegisterForm({
@@ -137,7 +132,7 @@ export function RegisterForm({
   isLoading,
   error,
 }: RegisterFormProps) {
-  const [values, setValues] = React.useState({
+  const [values, setValues] = React.useState<RegisterPayload>({
     fName: "",
     lName: "",
     email: "",

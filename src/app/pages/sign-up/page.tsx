@@ -3,21 +3,16 @@
 import Link from "next/link";
 import { useAuth } from "../../hooks/useAuth";
 import { RegisterForm } from "../../components/Molecules/Forms";
+import type { RegisterPayload } from "../../interface/auth";
 
 export default function SignUp() {
-  const { register, loading, error } = useAuth();
+  const { register, registerStatus } = useAuth();
 
-  const handleSubmit = async (data: {
-    fName: string;
-    lName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-  }) => {
+  const handleSubmit = async (data: RegisterPayload) => {
     try {
       await register(data);
       window.location.href = "/pages/dashboard";
-    } catch (err) {
+    } catch {
       // Error is handled by useAuth
     }
   };
@@ -33,7 +28,8 @@ export default function SignUp() {
 
         <RegisterForm
           onSubmit={handleSubmit}
-          isLoading={loading}
+          isLoading={registerStatus.isPending}
+          error={registerStatus.error ? registerStatus.error.message : null}
         />
 
         <div className="mt-4 text-sm text-center text-neutral-600 dark:text-neutral-400">

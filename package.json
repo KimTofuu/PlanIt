@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:boards": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' src/app/api/boards/seed.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.62.7",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.20.0",
+    "mongodb": "^6.21.0",
     "next": "15.5.5",
     "react": "19.1.0",
     "react-dom": "19.1.0"
@@ -27,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.5",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

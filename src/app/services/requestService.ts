@@ -5,7 +5,7 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export interface RequestOptions {
   method?: HTTPMethod;
-  body?: any;
+  body?: unknown;
   token?: string;
   signal?: AbortSignal;
   params?: Record<string, string | number | boolean>;
@@ -19,7 +19,12 @@ function buildUrl(path: string, params?: RequestOptions["params"]) {
   return url.toString();
 }
 
-export async function request<T = any>(path: string, opts: RequestOptions = {}): Promise<T> {
+interface HttpError extends Error {
+  status?: number;
+  body?: unknown;
+}
+
+export async function request<T = unknown>(path: string, opts: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, token, signal, params } = opts;
   const url = buildUrl(path, params);
 
@@ -34,16 +39,26 @@ export async function request<T = any>(path: string, opts: RequestOptions = {}):
   const contentType = res.headers.get("content-type") ?? "";
   if (!res.ok) {
     // try to parse error body
-    let errBody: any = undefined;
+    let errBody: unknown = undefined;
     if (contentType.includes("application/json")) {
       errBody = await res.json().catch(() => undefined);
     } else {
       errBody = await res.text().catch(() => undefined);
     }
-    const error = new Error(errBody?.message ?? res.statusText);
-    // attach extra info
-    (error as any).status = res.status;
-    (error as any).body = errBody;
+
+    let message = res.statusText;
+    if (typeof errBody === "object" && errBody && "message" in errBody) {
+      const candidate = (errBody as Record<string, unknown>).message;
+      if (typeof candidate === "string" && candidate.trim()) {
+        message = candidate;
+      }
+    } else if (typeof errBody === "string" && errBody.trim()) {
+      message = errBody;
+    }
+
+    const error: HttpError = new Error(message);
+    error.status = res.status;
+    error.body = errBody;
     throw error;
   }
 

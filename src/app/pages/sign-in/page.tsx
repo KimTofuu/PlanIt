@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { useAuth } from "../../hooks/useAuth";
 import { LoginForm } from "../../components/Molecules/Forms";
+import type { LoginPayload } from "../../interface/auth";
 
 export default function SignIn() {
-  const { login, loading, error } = useAuth();
+  const { login, loginStatus } = useAuth();
 
-  const handleSubmit = async (data: { email: string; password: string }) => {
+  const handleSubmit = async (data: LoginPayload) => {
     try {
       await login(data);
       window.location.href = "/pages/dashboard";
-    } catch (err) {
+    } catch {
       // Error is handled by useAuth
     }
   };
@@ -24,7 +25,11 @@ export default function SignIn() {
           Welcome back to PlanIt
         </p>
 
-        <LoginForm onSubmit={handleSubmit} isLoading={loading} />
+        <LoginForm
+          onSubmit={handleSubmit}
+          isLoading={loginStatus.isPending}
+          error={loginStatus.error ? loginStatus.error.message : null}
+        />
 
         <p className="mt-4 text-sm text-center">
           Don&apos;t have an account?{" "}

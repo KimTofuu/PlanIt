@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -18,7 +20,16 @@ export default function Field({
   id,
   ...props
 }: FieldProps) {
-  const inputId = id || `field-${Math.random().toString(36).substr(2, 9)}`;
+  const autoId = React.useId();
+  const normalizedLabel = label
+    ? label.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    : undefined;
+  const fallbackId = props.name
+    ? `field-${props.name}`
+    : normalizedLabel
+    ? `field-${normalizedLabel}`
+    : `field-${autoId}`;
+  const inputId = id || fallbackId;
 
   const baseStyles = "transition-colors focus:outline-none";
 

@@ -5,19 +5,29 @@ if (!process.env.MONGODB_URI) {
 }
 
 const uri = process.env.MONGODB_URI;
-const options: MongoClientOptions = {
-  tls: true,
-  tlsAllowInvalidCertificates: true, // Add this for development
-  tlsAllowInvalidHostnames: true,
-  serverSelectionTimeoutMS: 5000,
-  connectTimeoutMS: 10000,
-};
+
+const shouldUseTls =
+  process.env.MONGODB_TLS?.toLowerCase() === "true" ||
+  uri.startsWith("mongodb+srv://");
+
+const options: MongoClientOptions = shouldUseTls
+  ? {
+      tls: true,
+      tlsAllowInvalidCertificates: true, // relaxed dev defaults for self-signed certs
+      tlsAllowInvalidHostnames: true,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+    }
+  : {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+    };
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 if (process.env.NODE_ENV === "development") {
-  let globalWithMongo = global as typeof globalThis & {
+  const globalWithMongo = global as typeof globalThis & {
     _mongoClientPromise?: Promise<MongoClient>;
   };
 
