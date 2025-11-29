@@ -17,10 +17,10 @@ export default function Home() {
                     <Link href="#about" className="hover:underline">
                         About
                     </Link>
-                    <Link href="/sign-in" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
+                    <Link href="/pages/sign-in" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
                         Sign in
                     </Link>
-                    <Link href="/sign-up" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
+                    <Link href="/pages/sign-up" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
                         Sign up
                     </Link>
                 </nav>
@@ -38,7 +38,7 @@ export default function Home() {
                             Visualize your workflow with boards, lists, and cards — just like Trello.
                         </p>
                         <div className="flex gap-4 flex-wrap">
-                            <Link href="/sign-up" className="px-6 py-3 bg-foreground text-background rounded-md font-medium hover:opacity-90">
+                            <Link href="/pages/sign-up" className="px-6 py-3 bg-foreground text-background rounded-md font-medium hover:opacity-90">
                                 Get Started Free
                             </Link>
                             <Link href="#features" className="px-6 py-3 border rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800">
@@ -110,11 +110,11 @@ export default function Home() {
                         <h2 className="text-3xl font-bold mb-6">About PlanIt</h2>
                         <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-4">
                             PlanIt is a powerful task management platform designed to help individuals and teams 
-                            organize their work efficiently. Whether you're managing personal projects or coordinating 
+                            organize their work efficiently. Whether you&apos;re managing personal projects or coordinating 
                             with a large team, PlanIt provides the tools you need to stay productive.
                         </p>
                         <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-4">
-                            Inspired by the simplicity and effectiveness of Trello, we've built PlanIt to be intuitive, 
+                            Inspired by the simplicity and effectiveness of Trello, we&apos;ve built PlanIt to be intuitive, 
                             flexible, and powerful. Our mission is to make project management accessible to everyone, 
                             from students to professionals.
                         </p>
