@@ -1,33 +1,9 @@
+import { TrelloBoard, TrelloCard, TrelloList } from "../interface/trello";
+
 const TRELLO_API_KEY = process.env.NEXT_PUBLIC_TRELLO_API_KEY;
 const TRELLO_TOKEN = process.env.NEXT_PUBLIC_TRELLO_TOKEN;
 const BASE_URL = "https://api.trello.com/1";
 
-export interface TrelloBoard {
-  id: string;
-  name: string;
-  desc: string;
-  url: string;
-  prefs: {
-    backgroundColor?: string;
-    backgroundImage?: string;
-  };
-  lists?: TrelloList[];
-}
-
-export interface TrelloList {
-  id: string;
-  name: string;
-  cards?: TrelloCard[];
-}
-
-export interface TrelloCard {
-  id: string;
-  name: string;
-  desc: string;
-  due: string | null;
-  labels: Array<{ name: string; color: string }>;
-  idList: string;
-}
 
 export const trelloService = {
   // Get all boards for the authenticated user
