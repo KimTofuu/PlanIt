@@ -473,7 +473,7 @@ export default function TrelloBoardPage() {
         </p>
         <Button
           variant="outline"
-          onClick={() => router.push("/pages/dashboard")}
+          onClick={() => router.push("/..")}
         >
           Back to Dashboard
         </Button>
@@ -500,7 +500,7 @@ export default function TrelloBoardPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push("/pages/dashboard")}
+                onClick={() => router.push("/..")}
                 className="!bg-white/10 !text-white !border-white/20 hover:!bg-white/20"
               >
                 ← Back
