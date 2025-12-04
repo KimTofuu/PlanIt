@@ -1,146 +1,283 @@
-import Link from "next/link";
+"use client";
 
-export default function Home() {
-    return (
-        <div className="font-sans min-h-screen bg-gray-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
-            <header className="max-w-6xl mx-auto p-6 flex items-center justify-between">
-                <Link href="/" className="text-2xl font-bold">
-                    PlanIt
-                </Link>
-                <nav className="hidden sm:flex gap-6 items-center">
-                    <Link href="#features" className="hover:underline">
-                        Features
-                    </Link>
-                    <Link href="#pricing" className="hover:underline">
-                        Pricing
-                    </Link>
-                    <Link href="#about" className="hover:underline">
-                        About
-                    </Link>
-                    <Link href="/pages/sign-in" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
-                        Sign in
-                    </Link>
-                    <Link href="/pages/sign-up" className="px-4 py-2 bg-foreground text-background rounded-full hover:bg-gray-600 hover:text-white">
-                        Sign up
-                    </Link>
-                </nav>
-            </header>
+import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { DashboardHeader } from "./components/Organisms/DashboardHeader";
+import { DashboardStats } from "./components/Organisms/DashboardStats";
+import { BoardsSection } from "./components/Organisms/BoardsSection";
+import { ActivityFeed } from "./components/Organisms/ActivityFeed";
+import { useAuth } from "./hooks/useAuth";
+import { useBoards } from "./hooks/useBoards";
+import { useTrelloBoards } from "./hooks/useTrello";
+import toast from "react-hot-toast";
+import Button from "./components/Atoms/Buttons";
 
-            <main className="max-w-6xl mx-auto px-6">
-                {/* Hero Section */}
-                <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center py-12">
-                    <div>
-                        <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-4">
-                            Organize your work and life with PlanIt
-                        </h1>
-                        <p className="text-neutral-600 dark:text-neutral-300 mb-6">
-                            Manage projects, track tasks, and collaborate with your team seamlessly. 
-                            Visualize your workflow with boards, lists, and cards — just like Trello.
-                        </p>
-                        <div className="flex gap-4 flex-wrap">
-                            <Link href="/pages/sign-up" className="px-6 py-3 bg-foreground text-background rounded-md font-medium hover:opacity-90">
-                                Get Started Free
-                            </Link>
-                            <Link href="#features" className="px-6 py-3 border rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                                View Features
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="bg-neutral-200 dark:bg-neutral-800 rounded-lg p-8 h-80 flex items-center justify-center">
-                        <p className="text-neutral-500 dark:text-neutral-400">
-                            [Task Board Preview Placeholder]
-                        </p>
-                    </div>
-                </section>
+export default function Dashboard() {
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [showTrelloBoards, setShowTrelloBoards] = useState(false);
+  const { logout, user } = useAuth();
+  const { boardsQuery, createBoard, createStatus } = useBoards();
+  const trelloBoardsQuery = useTrelloBoards();
 
-                {/* Features Section */}
-                <section id="features" className="py-16">
-                    <h2 className="text-3xl font-bold text-center mb-12">
-                        Features that boost your productivity
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm">
-                            <div className="text-4xl mb-4">📋</div>
-                            <h3 className="text-xl font-semibold mb-2">Boards & Lists</h3>
-                            <p className="text-neutral-600 dark:text-neutral-400">
-                                Create boards for projects and organize tasks into customizable lists.
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm">
-                            <div className="text-4xl mb-4">🏷️</div>
-                            <h3 className="text-xl font-semibold mb-2">Labels & Tags</h3>
-                            <p className="text-neutral-600 dark:text-neutral-400">
-                                Categorize and prioritize tasks with color-coded labels.
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm">
-                            <div className="text-4xl mb-4">👥</div>
-                            <h3 className="text-xl font-semibold mb-2">Team Collaboration</h3>
-                            <p className="text-neutral-600 dark:text-neutral-400">
-                                Invite team members, assign tasks, and work together in real-time.
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm">
-                            <div className="text-4xl mb-4">📅</div>
-                            <h3 className="text-xl font-semibold mb-2">Due Dates</h3>
-                            <p className="text-neutral-600 dark:text-neutral-400">
-                                Set deadlines and receive reminders to stay on track.
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm">
-                            <div className="text-4xl mb-4">📎</div>
-                            <h3 className="text-xl font-semibold mb-2">Attachments</h3>
-                            <p className="text-neutral-600 dark:text-neutral-400">
-                                Add files, images, and links directly to your cards.
-                            </p>
-                        </div>
-                        <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-sm">
-                            <div className="text-4xl mb-4">📊</div>
-                            <h3 className="text-xl font-semibold mb-2">Progress Tracking</h3>
-                            <p className="text-neutral-600 dark:text-neutral-400">
-                                Monitor project progress with visual analytics and reports.
-                            </p>
-                        </div>
-                    </div>
-                </section>
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    const toastId = toast.loading("Logging out...");
+    try {
+      await logout();
+      toast.success("Logged out successfully", { id: toastId });
+      router.push("/pages/sign-in");
+    } catch (error) {
+      toast.error("Failed to logout", { id: toastId });
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
-                {/* About Section */}
-                <section id="about" className="py-16 bg-white dark:bg-neutral-800 -mx-6 px-6 rounded-lg">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <h2 className="text-3xl font-bold mb-6">About PlanIt</h2>
-                        <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-4">
-                            PlanIt is a powerful task management platform designed to help individuals and teams 
-                            organize their work efficiently. Whether you&apos;re managing personal projects or coordinating 
-                            with a large team, PlanIt provides the tools you need to stay productive.
-                        </p>
-                        <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-4">
-                            Inspired by the simplicity and effectiveness of Trello, we&apos;ve built PlanIt to be intuitive, 
-                            flexible, and powerful. Our mission is to make project management accessible to everyone, 
-                            from students to professionals.
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-12">
-                            <div>
-                                <h3 className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">10K+</h3>
-                                <p className="text-neutral-600 dark:text-neutral-400">Active Users</p>
-                            </div>
-                            <div>
-                                <h3 className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">50K+</h3>
-                                <p className="text-neutral-600 dark:text-neutral-400">Projects Created</p>
-                            </div>
-                            <div>
-                                <h3 className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">99.9%</h3>
-                                <p className="text-neutral-600 dark:text-neutral-400">Uptime</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
+  const handleImportFromTrello = async () => {
+    const toastId = toast.loading("Importing boards from Trello...");
+    try {
+      if (!trelloBoardsQuery.data || trelloBoardsQuery.data.length === 0) {
+        toast.error("No Trello boards found", { id: toastId });
+        return;
+      }
 
-            <footer className="max-w-6xl mx-auto px-6 py-8 mt-16 border-t border-neutral-200 dark:border-neutral-800">
-                <div className="text-center text-neutral-600 dark:text-neutral-400">
-                    <p>&copy; 2025 PlanIt. All rights reserved.</p>
-                </div>
-            </footer>
-        </div>
-    );
+      let imported = 0;
+      for (const trelloBoard of trelloBoardsQuery.data) {
+        try {
+          await createBoard({
+            name: trelloBoard.name,
+            description: trelloBoard.desc || undefined,
+            color: trelloBoard.prefs?.backgroundColor || "#3b82f6",
+          });
+          imported++;
+        } catch (err) {
+          console.error(`Failed to import board: ${trelloBoard.name}`, err);
+        }
+      }
+
+      if (imported > 0) {
+        toast.success(`Successfully imported ${imported} board(s) from Trello!`, {
+          id: toastId,
+        });
+      } else {
+        toast.error("Failed to import any boards", { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Failed to import boards from Trello", { id: toastId });
+    }
+  };
+
+  const handleOpenTrelloBoard = (boardId: string) => {
+    router.push(`/pages/dashboard/trello/${boardId}`);
+  };
+
+  const totalBoards = boardsQuery.data?.length ?? 0;
+  const totalCards =
+    boardsQuery.data?.reduce((sum, board) => sum + board.cardCount, 0) ?? 0;
+  const totalTrelloBoards = trelloBoardsQuery.data?.length ?? 0;
+
+  const activityItems = useMemo(
+    () => [
+      {
+        id: "1",
+        actor: user ? `${user.fName} ${user.lName}` : "You",
+        action: "created a new workspace",
+        timestamp: "just now",
+        accent: "bg-blue-500",
+      },
+      {
+        id: "2",
+        actor: "Team",
+        action: "updated sprint goals",
+        timestamp: "2 hours ago",
+        accent: "bg-green-500",
+      },
+      {
+        id: "3",
+        actor: "Marketing",
+        action: "launched onboarding campaign",
+        timestamp: "1 day ago",
+        accent: "bg-purple-500",
+      },
+    ],
+    [user]
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900">
+      <DashboardHeader
+        userName={user ? user.fName : undefined}
+        onLogout={handleLogout}
+        isLoggingOut={loggingOut}
+      />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section className="mb-8">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+            {user ? `Welcome back, ${user.fName}! 👋` : "Welcome back! 👋"}
+          </h1>
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Here&apos;s what&apos;s happening with your projects today.
+          </p>
+        </section>
+
+        <DashboardStats
+          totalBoards={totalBoards}
+          totalCards={totalCards}
+          recentActivityCount={activityItems.length}
+        />
+
+        {/* Trello Integration Section */}
+        <section className="mb-8">
+          <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <span className="text-2xl">📋</span>
+                  Trello Integration
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                  Import your Trello boards to PlanIt
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTrelloBoards(!showTrelloBoards)}
+                  disabled={trelloBoardsQuery.isLoading}
+                >
+                  {showTrelloBoards ? "Hide" : "Show"} Trello Boards (
+                  {totalTrelloBoards})
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleImportFromTrello}
+                  isLoading={createStatus.isPending}
+                  disabled={
+                    !trelloBoardsQuery.data ||
+                    trelloBoardsQuery.data.length === 0 ||
+                    trelloBoardsQuery.isLoading
+                  }
+                >
+                  Import All from Trello
+                </Button>
+              </div>
+            </div>
+
+            {showTrelloBoards && (
+              <div className="mt-4">
+                {trelloBoardsQuery.isLoading && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <p className="ml-3 text-neutral-500">
+                      Loading Trello boards...
+                    </p>
+                  </div>
+                )}
+
+                {trelloBoardsQuery.isError && (
+                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                    <p className="text-red-600 dark:text-red-400">
+                      Failed to load Trello boards. Check your API credentials in
+                      .env.local
+                    </p>
+                  </div>
+                )}
+
+                {trelloBoardsQuery.data && trelloBoardsQuery.data.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-neutral-600 dark:text-neutral-400">
+                      No Trello boards found. Create some boards in Trello first.
+                    </p>
+                  </div>
+                )}
+
+                {trelloBoardsQuery.data && trelloBoardsQuery.data.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {trelloBoardsQuery.data.map((board) => (
+                      <div
+                        key={board.id}
+                        onClick={() => handleOpenTrelloBoard(board.id)}
+                        className="p-4 rounded-lg border-2 border-neutral-200 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer"
+                        style={{
+                          backgroundColor: board.prefs?.backgroundColor
+                            ? `${board.prefs.backgroundColor}20`
+                            : undefined,
+                        }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                            {board.name}
+                          </h3>
+                          {board.prefs?.backgroundColor && (
+                            <div
+                              className="w-4 h-4 rounded-full border border-neutral-300"
+                              style={{
+                                backgroundColor: board.prefs.backgroundColor,
+                              }}
+                            ></div>
+                          )}
+                        </div>
+
+                        {board.desc && (
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3 line-clamp-2">
+                            {board.desc}
+                          </p>
+                        )}
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenTrelloBoard(board.id);
+                            }}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            Open Board →
+                          </button>
+                          <a
+                            href={board.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-neutral-600 dark:text-neutral-400 hover:underline inline-flex items-center gap-1"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Trello
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <BoardsSection
+          boards={boardsQuery.data}
+          isLoading={boardsQuery.isLoading}
+          errorMessage={boardsQuery.error ? boardsQuery.error.message : null}
+          onCreateBoard={createBoard}
+          isCreating={createStatus.isPending}
+        />
+
+        <ActivityFeed items={activityItems} />
+      </main>
+    </div>
+  );
 }
