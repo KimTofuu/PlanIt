@@ -11,11 +11,16 @@ import { useBoards } from "./hooks/useBoards";
 import { useTrelloBoards } from "./hooks/useTrello";
 import toast from "react-hot-toast";
 import Button from "./components/Atoms/Buttons";
+import AIChat from "./components/Organisms/AIChat";
+import { TrelloBoardCard } from "./components/Molecules/TrelloBoard";
+
+type TabType = "boards" | "ai-chat";
 
 export default function Dashboard() {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
   const [showTrelloBoards, setShowTrelloBoards] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("ai-chat"); // Changed default to "ai-chat"
   const { logout, user } = useAuth();
   const { boardsQuery, createBoard, createStatus } = useBoards();
   const trelloBoardsQuery = useTrelloBoards();
@@ -268,15 +273,31 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <BoardsSection
-          boards={boardsQuery.data}
-          isLoading={boardsQuery.isLoading}
-          errorMessage={boardsQuery.error ? boardsQuery.error.message : null}
-          onCreateBoard={createBoard}
-          isCreating={createStatus.isPending}
-        />
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="border-b border-neutral-200 dark:border-neutral-700">
+            <nav className="flex gap-8">
+              <button
+                onClick={() => setActiveTab("ai-chat")}
+                className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "ai-chat"
+                    ? "border-purple-500 text-purple-600 dark:text-purple-400"
+                    : "border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+                }`}
+              >
+                🤖 AI Assistant
+                <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 rounded-full">
+                  NEW
+                </span>
+              </button>
+            </nav>
+          </div>
+        </div>
 
-        <ActivityFeed items={activityItems} />
+        {/* AI Chat - Always Active */}
+        <div>
+          <AIChat />
+        </div>
       </main>
     </div>
   );

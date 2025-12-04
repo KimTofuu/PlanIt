@@ -25,7 +25,7 @@ export function useTrelloBoardWithData(boardId: string) {
     queryFn: () => trelloService.getBoardWithListsAndCards(boardId),
     enabled: !!boardId,
     staleTime: 60_000,
-    refetchInterval: 15_000,
+    refetchInterval: 5_000,
     refetchOnWindowFocus: true,
   });
 }
