@@ -349,9 +349,6 @@ export default function Dashboard() {
                 }`}
               >
                 🤖 AI Assistant
-                <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 rounded-full">
-                  NEW
-                </span>
               </button>
             </nav>
           </div>
