@@ -1,29 +1,73 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { DashboardHeader } from "./components/Organisms/DashboardHeader";
-import { DashboardStats } from "./components/Organisms/DashboardStats";
-import { BoardsSection } from "./components/Organisms/BoardsSection";
-import { ActivityFeed } from "./components/Organisms/ActivityFeed";
+import { useMemo, useState, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useAuth } from "./hooks/useAuth";
 import { useBoards } from "./hooks/useBoards";
 import { useTrelloBoards } from "./hooks/useTrello";
 import toast from "react-hot-toast";
 import Button from "./components/Atoms/Buttons";
-import AIChat from "./components/Organisms/AIChat";
-import { TrelloBoardCard } from "./components/Molecules/TrelloBoard";
 
-type TabType = "boards" | "ai-chat";
+const DashboardHeader = dynamic(
+  () =>
+    import("./components/Organisms/DashboardHeader").then((mod) => ({
+      default: mod.DashboardHeader,
+    })),
+  {
+    loading: () => (
+      <div className="h-16 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 animate-pulse"></div>
+    ),
+  }
+);
+
+const DashboardStats = dynamic(
+  () =>
+    import("./components/Organisms/DashboardStats").then((mod) => ({
+      default: mod.DashboardStats,
+    })),
+  {
+    loading: () => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white dark:bg-neutral-800 rounded-lg p-6 h-32"></div>
+        ))}
+      </div>
+    ),
+  }
+);
+
+const AIChat = dynamic(
+  () => import("./components/Organisms/AIChat"),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center h-[600px] bg-white dark:bg-neutral-900 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-800">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Loading AI Assistant...
+          </p>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+type TabType = "ai-chat";
 
 export default function Dashboard() {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
   const [showTrelloBoards, setShowTrelloBoards] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("ai-chat"); // Changed default to "ai-chat"
+  const [activeTab, setActiveTab] = useState<TabType>("ai-chat");
   const { logout, user } = useAuth();
   const { boardsQuery, createBoard, createStatus } = useBoards();
-  const trelloBoardsQuery = useTrelloBoards();
+
+  const trelloBoardsQuery = useTrelloBoards({
+    enabled: showTrelloBoards,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -62,9 +106,12 @@ export default function Dashboard() {
       }
 
       if (imported > 0) {
-        toast.success(`Successfully imported ${imported} board(s) from Trello!`, {
-          id: toastId,
-        });
+        toast.success(
+          `Successfully imported ${imported} board(s) from Trello!`,
+          {
+            id: toastId,
+          }
+        );
       } else {
         toast.error("Failed to import any boards", { id: toastId });
       }
@@ -111,11 +158,17 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-neutral-900">
-      <DashboardHeader
-        userName={user ? user.fName : undefined}
-        onLogout={handleLogout}
-        isLoggingOut={loggingOut}
-      />
+      <Suspense
+        fallback={
+          <div className="h-16 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 animate-pulse"></div>
+        }
+      >
+        <DashboardHeader
+          userName={user ? user.fName : undefined}
+          onLogout={handleLogout}
+          isLoggingOut={loggingOut}
+        />
+      </Suspense>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <section className="mb-8">
@@ -127,14 +180,24 @@ export default function Dashboard() {
           </p>
         </section>
 
-        <DashboardStats
-          totalBoards={totalBoards}
-          totalCards={totalCards}
-          recentActivityCount={activityItems.length}
-        />
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-neutral-800 rounded-lg p-6 h-32"></div>
+              ))}
+            </div>
+          }
+        >
+          <DashboardStats
+            totalBoards={totalBoards}
+            totalCards={totalCards}
+            recentActivityCount={activityItems.length}
+          />
+        </Suspense>
 
         {/* Trello Integration Section */}
-        <section className="mb-8">
+        <section className="mt-8 mb-8">
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -286,18 +349,26 @@ export default function Dashboard() {
                 }`}
               >
                 🤖 AI Assistant
-                <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 rounded-full">
-                  NEW
-                </span>
               </button>
             </nav>
           </div>
         </div>
 
-        {/* AI Chat - Always Active */}
-        <div>
+        {/* AI Chat - Lazy Loaded */}
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center h-[600px] bg-white dark:bg-neutral-900 rounded-lg shadow-lg">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+                <p className="text-neutral-600 dark:text-neutral-400">
+                  Loading AI Assistant...
+                </p>
+              </div>
+            </div>
+          }
+        >
           <AIChat />
-        </div>
+        </Suspense>
       </main>
     </div>
   );
