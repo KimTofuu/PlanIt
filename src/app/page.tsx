@@ -218,18 +218,6 @@ export default function Dashboard() {
                   {showTrelloBoards ? "Hide" : "Show"} Trello Boards (
                   {totalTrelloBoards})
                 </Button>
-                <Button
-                  variant="primary"
-                  onClick={handleImportFromTrello}
-                  isLoading={createStatus.isPending}
-                  disabled={
-                    !trelloBoardsQuery.data ||
-                    trelloBoardsQuery.data.length === 0 ||
-                    trelloBoardsQuery.isLoading
-                  }
-                >
-                  Import All from Trello
-                </Button>
               </div>
             </div>
 
