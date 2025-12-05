@@ -30,15 +30,7 @@ import {
 } from "../../../../hooks/useTrello";
 import Button from "../../../../components/Atoms/Buttons";
 import toast from "react-hot-toast";
-
-interface TrelloCard {
-  id: string;
-  name: string;
-  desc: string;
-  due: string | null;
-  labels: Array<{ name: string; color: string }>;
-  idList: string;
-}
+import { TrelloCard } from "../../../../interface/trello";
 
 function SortableCard({
   card,
