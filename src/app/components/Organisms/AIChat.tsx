@@ -4,14 +4,16 @@ import { useState, useRef, useEffect } from "react";
 import { useTrelloBoards } from "../../hooks/useTrello";
 import { bytezService } from "../../services/bytezService";
 import type { ChatMessage } from "../../interface/aiChat";
+import type { TrelloBoard } from "../../interface/trello";
 import toast from "react-hot-toast";
 
-// This component surfaces a modernized chat experience for the AI assistant.
 export default function AIChat() {
   const { data: boards, isLoading: boardsLoading } = useTrelloBoards();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [fullBoardData, setFullBoardData] = useState<TrelloBoard[]>([]);
+  const [isFetchingDetails, setIsFetchingDetails] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -22,10 +24,33 @@ export default function AIChat() {
     scrollToBottom();
   }, [messages]);
 
-  // Welcome message
   useEffect(() => {
-    if (boards && boards.length > 0 && messages.length === 0) {
-      const insights = bytezService.generateInsights(boards);
+    const fetchFullDetails = async () => {
+      if (!boards || boards.length === 0 || fullBoardData.length > 0) return;
+
+      setIsFetchingDetails(true);
+      try {
+        const detailedBoards = await Promise.all(
+          boards.map(async (board) => {
+            const details = await bytezService.fetchBoardDetails(board.id);
+            return details || board;
+          })
+        );
+        setFullBoardData(detailedBoards);
+      } catch (error) {
+        console.error("Failed to fetch full board details:", error);
+        setFullBoardData(boards);
+      } finally {
+        setIsFetchingDetails(false);
+      }
+    };
+
+    fetchFullDetails();
+  }, [boards, fullBoardData.length]);
+
+  useEffect(() => {
+    if (fullBoardData.length > 0 && messages.length === 0) {
+      const insights = bytezService.generateInsights(fullBoardData);
       setMessages([
         {
           role: "assistant",
@@ -33,19 +58,18 @@ export default function AIChat() {
         },
       ]);
     }
-  }, [boards, messages.length]);
+  }, [fullBoardData, messages.length]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || isTyping) return;
-    if (!boards || boards.length === 0) {
-      toast.error("No Trello boards available");
+    if (fullBoardData.length === 0) {
+      toast.error("Board data is still loading...");
       return;
     }
 
     const userMessage = input.trim();
     setInput("");
 
-    // Add user message
     const newMessages: ChatMessage[] = [
       ...messages,
       { role: "user", content: userMessage },
@@ -54,10 +78,9 @@ export default function AIChat() {
     setIsTyping(true);
 
     try {
-      // Get AI response (using basic board data only)
       const response = await bytezService.sendMessage(
         userMessage,
-        boards,
+        fullBoardData,
         messages
       );
 
@@ -100,13 +123,13 @@ export default function AIChat() {
     "Give me an overview",
   ];
 
-  if (boardsLoading) {
+  if (boardsLoading || isFetchingDetails) {
     return (
       <div className="flex h-[600px] items-center justify-center">
-        <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-10 py-12 text-center shadow-sm">
-          <i className="fa-solid fa-spinner fa-spin text-3xl text-[var(--brand-100)]" aria-hidden="true"></i>
-          <p className="text-sm text-[var(--foreground-muted)]">
-            Loading your boards...
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-neutral-600 dark:text-neutral-400">
+            {boardsLoading ? "Loading boards..." : "Fetching card details..."}
           </p>
         </div>
       </div>
@@ -123,7 +146,8 @@ export default function AIChat() {
         <div>
           <h2 className="text-lg font-semibold">PlanIt AI Assistant</h2>
           <p className="text-xs text-[var(--foreground-muted)]">
-            Ask me about your {boards?.length ?? 0} Trello board{boards && boards.length === 1 ? "" : "s"}
+            Ask me about your {boards?.length ?? 0} Trello board
+            {boards && boards.length === 1 ? "" : "s"}
           </p>
         </div>
         <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--foreground-muted)] shadow-sm">
@@ -140,9 +164,12 @@ export default function AIChat() {
               <i className="fa-regular fa-comments" aria-hidden="true"></i>
             </span>
             <div>
-              <h3 className="text-xl font-semibold text-[var(--foreground)]">Start a conversation</h3>
+              <h3 className="text-xl font-semibold text-[var(--foreground)]">
+                Start a conversation
+              </h3>
               <p className="mt-2 max-w-md text-sm text-[var(--foreground-muted)]">
-                Ask me anything about your Trello boards to uncover quick insights or get a status snapshot.
+                Ask me anything about your Trello boards to uncover quick insights
+                or get a status snapshot.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
@@ -161,7 +188,9 @@ export default function AIChat() {
           messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
             >
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm transition-colors ${
@@ -178,7 +207,9 @@ export default function AIChat() {
                     AI Assistant
                   </div>
                 )}
-                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                <p className="whitespace-pre-wrap leading-relaxed">
+                  {msg.content}
+                </p>
               </div>
             </div>
           ))
