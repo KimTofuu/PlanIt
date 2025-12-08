@@ -34,13 +34,6 @@ export function DashboardHeader({ userName, onLogout, isLoggingOut }: DashboardH
               <i className="fa-solid fa-chalkboard" aria-hidden="true"></i>
               Boards
             </Link>
-            <Link
-              href="/pages/dashboard/templates"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
-            >
-              <i className="fa-solid fa-shapes" aria-hidden="true"></i>
-              Templates
-            </Link>
           </nav>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-3">
