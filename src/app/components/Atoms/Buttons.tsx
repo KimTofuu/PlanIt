@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "danger" | "warning";
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   isLoading?: boolean;
@@ -18,18 +18,24 @@ export default function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = "font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const baseStyles = "inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-150 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
 
   const variantStyles = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-blue-300",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500 disabled:bg-gray-300",
-    outline: "border-2 border-gray-300 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700 focus:ring-gray-500 disabled:opacity-50",
-    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:bg-red-300",
-  };
+    primary:
+      "bg-[var(--semantic-azure)] text-white hover:bg-[#2563eb] active:bg-[#1d4ed8] focus-visible:ring-[rgba(59,130,246,0.35)] disabled:bg-[#93c5fd]",
+    secondary:
+      "bg-[var(--semantic-emerald)] text-white hover:bg-[#16a34a] active:bg-[#15803d] focus-visible:ring-[rgba(34,197,94,0.35)] disabled:bg-[#86efac]",
+    warning:
+      "bg-[var(--semantic-amber)] text-white hover:bg-[#d97706] active:bg-[#b45309] focus-visible:ring-[rgba(245,158,11,0.35)] disabled:bg-[#fcd34d]",
+    outline:
+      "border border-[var(--semantic-azure)] bg-transparent text-[var(--semantic-azure)] hover:bg-[rgba(59,130,246,0.08)] active:bg-[rgba(59,130,246,0.12)] focus-visible:ring-[rgba(59,130,246,0.2)] disabled:border-[rgba(59,130,246,0.35)] disabled:text-[rgba(59,130,246,0.35)]",
+    danger:
+      "bg-[var(--semantic-crimson)] text-white hover:bg-[#dc2626] active:bg-[#b91c1c] focus-visible:ring-[rgba(239,68,68,0.35)] disabled:bg-[#fca5a5]",
+  } satisfies Record<NonNullable<ButtonProps["variant"]>, string>;
 
   const sizeStyles = {
     sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
+    md: "px-4 py-2.5 text-base",
     lg: "px-6 py-3 text-lg",
   };
 
@@ -37,7 +43,7 @@ export default function Button({
 
   return (
     <button
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${className} disabled:cursor-not-allowed`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

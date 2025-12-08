@@ -5,20 +5,42 @@ interface StatCardProps {
   value: string | number;
   icon?: React.ReactNode;
   accent?: string;
+  description?: string;
 }
 
-export function StatCard({ title, value, icon, accent = "bg-blue-500" }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  icon,
+  accent = "from-[var(--brand-90)] to-[var(--secondary-90)]",
+  description,
+}: StatCardProps) {
   return (
-    <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm p-6 border border-neutral-200 dark:border-neutral-700">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-1">{title}</p>
-          <p className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{value}</p>
+    <article className="relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-alt)] p-7 shadow-[var(--shadow)] transition-transform hover:-translate-y-1">
+      <span className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${accent}`} aria-hidden="true"></span>
+      <div className="relative flex items-start justify-between gap-6">
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-[var(--foreground-muted)] opacity-80">
+            {title}
+          </p>
+          <p className="text-4xl font-semibold text-[var(--foreground)]">
+            {value}
+          </p>
+          {description && (
+            <p className="max-w-xs text-sm leading-relaxed text-[var(--foreground-muted)]">
+              {description}
+            </p>
+          )}
         </div>
-        <div className={`text-4xl flex items-center justify-center w-12 h-12 rounded-full text-white ${accent}`}>
-          {icon}
-        </div>
+        {icon && (
+          <div
+            className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-2xl text-white shadow-lg shadow-[rgba(15,23,42,0.18)]`}
+            aria-hidden="true"
+          >
+            {icon}
+          </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 }

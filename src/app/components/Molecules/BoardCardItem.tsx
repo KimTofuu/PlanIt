@@ -7,33 +7,37 @@ interface BoardCardItemProps {
 
 export function BoardCardItem({ card }: BoardCardItemProps) {
   return (
-    <div className="bg-white dark:bg-neutral-700 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-      <h3 className="font-medium text-neutral-900 dark:text-neutral-100 mb-2">{card.title}</h3>
+    <div className="cursor-pointer rounded-2xl border border-[var(--secondary-15)] bg-white p-5 shadow-[0_15px_30px_-20px_rgba(17,24,39,0.45)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_25px_45px_-25px_rgba(17,24,39,0.5)] dark:border-[rgba(255,255,255,0.08)] dark:bg-slate-900/80">
+      <h3 className="mb-2 font-semibold text-[var(--neutral-charcoal)] dark:text-slate-100">{card.title}</h3>
       {card.description && (
-        <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">{card.description}</p>
+        <p className="mb-3 text-sm leading-relaxed text-[var(--secondary-90)] dark:text-slate-300">{card.description}</p>
       )}
       <div className="flex items-center gap-2 flex-wrap mb-2">
         {card.labels.map((label) => (
           <span
             key={label}
-            className="bg-neutral-200 dark:bg-neutral-600 text-neutral-800 dark:text-neutral-200 text-xs px-2 py-1 rounded-full"
+            className="rounded-full bg-[var(--brand-15)] px-2.5 py-1 text-xs font-medium text-secondary-primary dark:bg-[rgba(255,255,255,0.08)] dark:text-[var(--brand-15)]"
           >
             {label}
           </span>
         ))}
       </div>
-      <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
+      <div className="flex items-center justify-between text-sm text-[var(--secondary-75)] dark:text-slate-300">
         {card.dueDate && (
-          <div className="flex items-center gap-1">
-            <span role="img" aria-label="calendar">
-              📅
-            </span>
-            {card.dueDate}
+          <div className="flex items-center gap-2">
+            <i className="fa-regular fa-calendar-days text-slate-400" aria-hidden="true"></i>
+            <span className="font-medium text-[var(--secondary-100)] dark:text-slate-200">{card.dueDate}</span>
           </div>
         )}
         <div className="flex items-center gap-2">
-          <span>💬 {card.commentsCount ?? 0}</span>
-          <span>📎 {card.attachmentsCount ?? 0}</span>
+          <span className="inline-flex items-center gap-1">
+            <i className="fa-regular fa-comments" aria-hidden="true"></i>
+            {card.commentsCount ?? 0}
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <i className="fa-solid fa-paperclip" aria-hidden="true"></i>
+            {card.attachmentsCount ?? 0}
+          </span>
         </div>
       </div>
     </div>

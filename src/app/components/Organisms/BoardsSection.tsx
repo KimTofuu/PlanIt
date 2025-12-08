@@ -43,57 +43,59 @@ export function BoardsSection({ boards, isLoading, onCreateBoard, isCreating, er
 
   return (
     <section className="mb-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Your Boards</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Your Boards</h2>
         <Button variant="primary" className="px-4" onClick={() => setIsFormOpen(true)}>
-          + Create Board
+          <i className="fa-solid fa-plus" aria-hidden="true"></i>
+          Create Board
         </Button>
       </div>
 
       {isFormOpen && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 mb-6 space-y-3"
+          className="mb-6 space-y-4 rounded-2xl border border-slate-200/80 bg-white/80 p-6 shadow-sm shadow-slate-200/60 backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/60"
         >
           <div>
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Board name
             </label>
             <input
               type="text"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="w-full px-3 py-2 rounded border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100"
+              className="w-full rounded-xl border border-slate-300/80 bg-white px-3 py-2 text-slate-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:focus:ring-blue-500/40"
               placeholder="e.g. Marketing Campaign"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Description
             </label>
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="w-full px-3 py-2 rounded border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100"
+              className="w-full rounded-xl border border-slate-300/80 bg-white px-3 py-2 text-slate-900 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:focus:ring-blue-500/40"
               placeholder="What is this board about?"
               rows={3}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Accent color
             </label>
             <input
               type="color"
               value={color}
               onChange={(event) => setColor(event.target.value)}
-              className="h-10 w-16 p-1 border border-neutral-300 dark:border-neutral-600 rounded"
+              className="h-10 w-16 cursor-pointer rounded border border-slate-300/80 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900/60"
             />
           </div>
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm font-medium text-rose-600 dark:text-rose-400">{error}</p>}
           <div className="flex gap-3">
-            <Button type="submit" variant="primary" isLoading={isCreating}>
+            <Button type="submit" variant="secondary" isLoading={isCreating}>
+              <i className="fa-solid fa-floppy-disk" aria-hidden="true"></i>
               Save Board
             </Button>
             <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>
@@ -103,13 +105,13 @@ export function BoardsSection({ boards, isLoading, onCreateBoard, isCreating, er
         </form>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {isLoading && <p className="text-neutral-500">Loading your boards...</p>}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {isLoading && <p className="text-slate-500">Loading your boards...</p>}
         {!isLoading && errorMessage && (
-          <p className="text-red-500">{errorMessage}</p>
+          <p className="text-rose-500">{errorMessage}</p>
         )}
         {!isLoading && boards && boards.length === 0 && (
-          <p className="text-neutral-600 dark:text-neutral-400">No boards yet. Create one to get started.</p>
+          <p className="text-slate-600 dark:text-slate-300">No boards yet. Create one to get started.</p>
         )}
         {boards?.map((board) => (
           <BoardSummaryCard key={board.id} board={board} />
