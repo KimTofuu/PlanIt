@@ -8,12 +8,13 @@ interface BoardCanvasProps {
 
 export function BoardCanvas({ board }: BoardCanvasProps) {
   return (
-    <div className="p-6 overflow-x-auto">
-      <div className="flex gap-4 min-w-max">
+    <div className="overflow-x-auto p-6">
+      <div className="flex min-w-max gap-5">
         {board.lists.length > 0 ? (
           board.lists.map((list) => <BoardColumn key={list.id} list={list} />)
         ) : (
-          <div className="flex-shrink-0 w-80 bg-white/20 border border-dashed border-white/40 rounded-lg p-4 text-white/80">
+          <div className="flex w-80 flex-shrink-0 flex-col gap-3 rounded-2xl border border-dashed border-white/40 bg-white/10 p-5 text-sm text-white/80">
+            <i className="fa-regular fa-note-sticky text-lg" aria-hidden="true"></i>
             <p>No lists yet. Integrate board mutation hooks to start building workflows.</p>
           </div>
         )}

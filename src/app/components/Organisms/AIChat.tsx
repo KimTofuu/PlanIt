@@ -6,6 +6,7 @@ import { bytezService } from "../../services/bytezService";
 import type { ChatMessage } from "../../interface/aiChat";
 import toast from "react-hot-toast";
 
+// This component surfaces a modernized chat experience for the AI assistant.
 export default function AIChat() {
   const { data: boards, isLoading: boardsLoading } = useTrelloBoards();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -28,7 +29,7 @@ export default function AIChat() {
       setMessages([
         {
           role: "assistant",
-          content: `👋 Hi! I'm your PlanIt AI Assistant. I can help you manage your Trello boards.\n\n${insights}\n\nWhat would you like to know about your boards?`,
+          content: `Hi! I'm your PlanIt AI Assistant. I can help you manage your Trello boards.\n\n${insights}\n\nWhat would you like to know about your boards?`,
         },
       ]);
     }
@@ -101,10 +102,10 @@ export default function AIChat() {
 
   if (boardsLoading) {
     return (
-      <div className="flex items-center justify-center h-[600px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-neutral-600 dark:text-neutral-400">
+      <div className="flex h-[600px] items-center justify-center">
+        <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-10 py-12 text-center shadow-sm">
+          <i className="fa-solid fa-spinner fa-spin text-3xl text-[var(--brand-100)]" aria-hidden="true"></i>
+          <p className="text-sm text-[var(--foreground-muted)]">
             Loading your boards...
           </p>
         </div>
@@ -113,39 +114,43 @@ export default function AIChat() {
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white dark:bg-neutral-900 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-800">
+    <div className="flex h-[620px] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)]">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 border-b border-neutral-200 dark:border-neutral-800 bg-gradient-to-r from-blue-500 to-purple-600">
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-          <span className="text-2xl">🤖</span>
+      <div className="flex items-center gap-3 border-b border-[var(--border)] bg-[var(--surface-alt)] px-6 py-5 text-[var(--foreground)]">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--brand-15)] text-xl text-[var(--brand-100)]">
+          <i className="fa-solid fa-robot" aria-hidden="true"></i>
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-white">
-            PlanIt AI Assistant
-          </h2>
-          <p className="text-xs text-white/80">
-            Ask me about your {boards?.length || 0} Trello board(s)
+          <h2 className="text-lg font-semibold">PlanIt AI Assistant</h2>
+          <p className="text-xs text-[var(--foreground-muted)]">
+            Ask me about your {boards?.length ?? 0} Trello board{boards && boards.length === 1 ? "" : "s"}
           </p>
+        </div>
+        <div className="ml-auto inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface)] px-3 py-1 text-xs font-semibold text-[var(--foreground-muted)] shadow-sm">
+          <span className="h-2 w-2 rounded-full bg-[var(--semantic-emerald)]"></span>
+          Online
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto bg-[var(--surface)] p-6">
         {messages.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">💬</div>
-            <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
-              Start a conversation
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-6">
-              Ask me anything about your Trello boards
-            </p>
-            <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
+          <div className="flex h-full flex-col items-center justify-center gap-6 rounded-[var(--radius-lg)] border border-dashed border-[var(--border)] bg-[var(--surface-alt)] p-10 text-center shadow-sm">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--brand-15)] text-3xl text-[var(--brand-100)]">
+              <i className="fa-regular fa-comments" aria-hidden="true"></i>
+            </span>
+            <div>
+              <h3 className="text-xl font-semibold text-[var(--foreground)]">Start a conversation</h3>
+              <p className="mt-2 max-w-md text-sm text-[var(--foreground-muted)]">
+                Ask me anything about your Trello boards to uncover quick insights or get a status snapshot.
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
               {suggestedQuestions.map((q, idx) => (
                 <button
                   key={idx}
                   onClick={() => setInput(q)}
-                  className="px-4 py-2 text-sm bg-blue-50 dark:bg-neutral-800 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-neutral-700 transition-colors"
+                  className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-medium text-[var(--foreground-muted)] transition-colors hover:border-[var(--brand-90)] hover:text-[var(--brand-100)]"
                 >
                   {q}
                 </button>
@@ -156,26 +161,24 @@ export default function AIChat() {
           messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`flex ${
-                msg.role === "user" ? "justify-end" : "justify-start"
-              }`}
+              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm shadow-sm transition-colors ${
                   msg.role === "user"
-                    ? "bg-blue-500 text-white"
-                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
+                    ? "bg-[var(--brand-90)] text-white shadow-[0_10px_24px_-18px_rgba(59,130,246,0.75)]"
+                    : "bg-[var(--surface-alt)] text-[var(--foreground)]"
                 }`}
               >
                 {msg.role === "assistant" && (
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">🤖</span>
-                    <span className="text-xs font-semibold opacity-70">
-                      AI Assistant
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--foreground-muted)]">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--brand-15)] text-[var(--brand-100)]">
+                      <i className="fa-solid fa-robot" aria-hidden="true"></i>
                     </span>
+                    AI Assistant
                   </div>
                 )}
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
               </div>
             </div>
           ))
@@ -183,11 +186,17 @@ export default function AIChat() {
 
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-neutral-100 dark:bg-neutral-800 rounded-lg px-4 py-3">
+            <div className="rounded-2xl bg-[var(--surface-alt)] px-4 py-3 text-[var(--foreground-muted)] shadow-sm">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce delay-100"></div>
-                <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce delay-200"></div>
+                <span className="h-2 w-2 animate-bounce rounded-full bg-current"></span>
+                <span
+                  className="h-2 w-2 animate-bounce rounded-full bg-current"
+                  style={{ animationDelay: "100ms" }}
+                ></span>
+                <span
+                  className="h-2 w-2 animate-bounce rounded-full bg-current"
+                  style={{ animationDelay: "200ms" }}
+                ></span>
               </div>
             </div>
           </div>
@@ -197,36 +206,24 @@ export default function AIChat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-neutral-200 dark:border-neutral-800 p-4">
-        <div className="flex gap-2">
+      <div className="border-t border-[var(--border)] bg-[var(--surface)] p-5 backdrop-blur-md">
+        <div className="flex gap-3">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder="Ask about your boards..."
             disabled={isTyping}
-            className="flex-1 px-4 py-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="flex-1 rounded-2xl border border-[var(--border)] bg-[var(--surface-alt)] px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--foreground-muted)] placeholder:opacity-70 shadow-sm transition-colors focus:outline-none focus:ring-4 focus:ring-[var(--brand-15)] focus:ring-offset-1 disabled:opacity-60"
           />
           <button
             onClick={handleSendMessage}
             disabled={!input.trim() || isTyping}
-            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white rounded-lg transition-colors flex items-center gap-2 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-2xl bg-[var(--brand-100)] px-6 py-3 font-semibold text-white shadow-[0_20px_40px_-18px_rgba(61,139,253,0.6)] transition-all hover:-translate-y-[1px] hover:bg-[var(--brand-90)] hover:shadow-[0_22px_44px_-16px_rgba(61,139,253,0.65)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(71,181,255,0.38)] disabled:cursor-not-allowed disabled:bg-[var(--brand-45)] disabled:shadow-none"
           >
-            <span>Send</span>
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
+            <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
+            Send
           </button>
         </div>
       </div>

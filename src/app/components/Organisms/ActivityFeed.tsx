@@ -14,17 +14,17 @@ interface ActivityFeedProps {
 
 export function ActivityFeed({ items }: ActivityFeedProps) {
   return (
-    <section className="bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-neutral-700 p-6">
-      <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">Recent Activity</h2>
+    <section className="rounded-3xl border border-slate-200/80 bg-white/80 p-6 shadow-sm shadow-slate-200/60 backdrop-blur-sm dark:border-slate-700/70 dark:bg-slate-900/60">
+      <h2 className="mb-4 text-xl font-semibold text-slate-900 dark:text-slate-100">Recent Activity</h2>
       <div className="space-y-4">
         {items.map((item) => (
           <div key={item.id} className="flex items-start gap-3">
-            <div className={`w-2 h-2 rounded-full ${item.accent} mt-2`}></div>
+            <div className={`mt-2 h-2 w-2 rounded-full ${item.accent}`}></div>
             <div className="flex-1">
-              <p className="text-neutral-900 dark:text-neutral-100">
+              <p className="text-slate-800 dark:text-slate-100">
                 <span className="font-semibold">{item.actor}</span> {item.action}
               </p>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">{item.timestamp}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{item.timestamp}</p>
             </div>
           </div>
         ))}
