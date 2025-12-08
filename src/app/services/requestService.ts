@@ -1,4 +1,3 @@
-// src/services/requestService.ts
 import { API_BASE, jsonHeaders } from "../constants/api";
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -33,12 +32,11 @@ export async function request<T = unknown>(path: string, opts: RequestOptions = 
     headers: jsonHeaders(token),
     body: body !== undefined ? JSON.stringify(body) : undefined,
     signal,
-    credentials: "include", // optional: include cookies
+    credentials: "include",
   });
 
   const contentType = res.headers.get("content-type") ?? "";
   if (!res.ok) {
-    // try to parse error body
     let errBody: unknown = undefined;
     if (contentType.includes("application/json")) {
       errBody = await res.json().catch(() => undefined);
@@ -65,6 +63,5 @@ export async function request<T = unknown>(path: string, opts: RequestOptions = 
   if (contentType.includes("application/json")) {
     return (await res.json()) as T;
   }
-  // fallback: return raw text
   return (await res.text()) as unknown as T;
 }
