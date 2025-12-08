@@ -10,17 +10,8 @@ export function useTrelloBoards(
 ) {
   return useQuery({
     queryKey: ["trello", "boards"],
-    queryFn: async () => {
-      const response = await fetch(
-        `https://api.trello.com/1/members/me/boards?key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch Trello boards");
-      }
-
-      return response.json();
-    },
+    queryFn: async () => trelloService.getBoards(),
+    enabled: !!TRELLO_API_KEY && !!TRELLO_TOKEN,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -41,24 +32,12 @@ export function useTrelloBoardWithData(boardId: string) {
 }
 
 export function useTrelloBoard(
-  boardId: string | null,
+  boardId: string,
   options?: Omit<UseQueryOptions<TrelloBoard>, "queryKey" | "queryFn">
 ) {
   return useQuery({
     queryKey: ["trello", "board", boardId],
-    queryFn: async () => {
-      if (!boardId) throw new Error("Board ID is required");
-
-      const response = await fetch(
-        `https://api.trello.com/1/boards/${boardId}?lists=open&cards=visible&key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch board details");
-      }
-
-      return response.json();
-    },
+    queryFn: async () => trelloService.getBoard(boardId),
     enabled: !!boardId,
     staleTime: 3 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -68,24 +47,12 @@ export function useTrelloBoard(
 }
 
 export function useTrelloLists(
-  boardId: string | null,
+  boardId: string,
   options?: Omit<UseQueryOptions<TrelloList[]>, "queryKey" | "queryFn">
 ) {
   return useQuery({
     queryKey: ["trello", "lists", boardId],
-    queryFn: async () => {
-      if (!boardId) throw new Error("Board ID is required");
-
-      const response = await fetch(
-        `https://api.trello.com/1/boards/${boardId}/lists?key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch lists");
-      }
-
-      return response.json();
-    },
+    queryFn: async () => trelloService.getLists(boardId),
     enabled: !!boardId,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -94,24 +61,12 @@ export function useTrelloLists(
 }
 
 export function useTrelloCards(
-  listId: string | null,
+  listId: string,
   options?: Omit<UseQueryOptions<TrelloCard[]>, "queryKey" | "queryFn">
 ) {
   return useQuery({
     queryKey: ["trello", "cards", listId],
-    queryFn: async () => {
-      if (!listId) throw new Error("List ID is required");
-
-      const response = await fetch(
-        `https://api.trello.com/1/lists/${listId}/cards?key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch cards");
-      }
-
-      return response.json();
-    },
+    queryFn: async () => trelloService.getCards(listId),
     enabled: !!listId,
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -125,12 +80,7 @@ export function usePrefetchTrelloBoard() {
   return (boardId: string) => {
     queryClient.prefetchQuery({
       queryKey: ["trello", "board", boardId],
-      queryFn: async () => {
-        const response = await fetch(
-          `https://api.trello.com/1/boards/${boardId}?lists=open&cards=visible&key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`
-        );
-        return response.json();
-      },
+      queryFn: async () => trelloService.getBoard(boardId),
       staleTime: 3 * 60 * 1000,
     });
   };

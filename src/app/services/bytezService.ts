@@ -10,9 +10,6 @@ const sdk = new Bytez(BYTEZ_API_KEY);
 const model = sdk.model("Qwen/Qwen3-0.6B");
 
 export const bytezService = {
-  /**
-   * Fetch specific board details (lists and cards) only when needed
-   */
   async fetchBoardDetails(boardId: string): Promise<any> {
     try {
       const response = await fetch(
@@ -23,7 +20,6 @@ export const bytezService = {
 
       const board = await response.json();
 
-      // Fetch cards for each list
       if (board.lists) {
         board.lists = await Promise.all(
           board.lists.map(async (list: any) => {
@@ -47,9 +43,6 @@ export const bytezService = {
     }
   },
 
-  /**
-   * Analyze user question and determine what data is needed
-   */
   async analyzeAndFetchData(
     userMessage: string,
     boards: TrelloBoard[]
@@ -74,23 +67,19 @@ export const bytezService = {
     );
 
     if (!needsDetails) {
-      // Return basic board info only
       return {
         context: this.buildBasicBoardContext(boards),
         needsDetails: false,
       };
     }
 
-    // Determine which boards need details
     const relevantBoards = boards.filter((board) =>
       lowerMessage.includes(board.name.toLowerCase())
     );
 
-    // If no specific board mentioned, fetch details for all (or limit to first few)
     const boardsToFetch =
       relevantBoards.length > 0 ? relevantBoards : boards.slice(0, 3);
 
-    // Fetch detailed data for relevant boards only
     const detailedBoards = await Promise.all(
       boardsToFetch.map(async (board) => {
         const details = await this.fetchBoardDetails(board.id);
@@ -104,9 +93,6 @@ export const bytezService = {
     };
   },
 
-  /**
-   * Build basic context (just board names and IDs)
-   */
   buildBasicBoardContext(boards: TrelloBoard[]): string {
     if (!boards || boards.length === 0) {
       return "No boards available.";
@@ -123,9 +109,6 @@ ${idx + 1}. "${board.name}"
       .join("\n");
   },
 
-  /**
-   * Build detailed context (lists and cards)
-   */
   buildDetailedBoardContext(boards: any[]): string {
     if (!boards || boards.length === 0) {
       return "No boards available.";
@@ -146,7 +129,6 @@ Board ${idx + 1}: "${board.name}"
 - Total Lists: ${totalLists}
 - Total Cards: ${totalCards}`;
 
-        // Add list details
         if (board.lists && board.lists.length > 0) {
           boardInfo += `\n\nLists:`;
           board.lists.forEach((list: any, listIdx: number) => {
@@ -154,7 +136,6 @@ Board ${idx + 1}: "${board.name}"
               list.cards?.length || 0
             } cards)`;
 
-            // Add card details
             if (list.cards && list.cards.length > 0) {
               boardInfo += `\n     Cards:`;
               list.cards.forEach((card: any, cardIdx: number) => {
@@ -185,7 +166,6 @@ Board ${idx + 1}: "${board.name}"
     conversationHistory: ChatMessage[] = []
   ): Promise<ChatResponse> {
     try {
-      // Analyze question and fetch only needed data
       const { context, needsDetails } = await this.analyzeAndFetchData(
         userMessage,
         boards
@@ -247,7 +227,6 @@ Please provide a helpful, concise response based on the board data above.${
         };
       }
 
-      // Remove <think> tags
       messageContent = messageContent
         .replace(/<think>[\s\S]*?<\/think>\s*/gi, "")
         .trim();
@@ -264,9 +243,6 @@ Please provide a helpful, concise response based on the board data above.${
     }
   },
 
-  /**
-   * Build detailed context string from all boards
-   */
   buildBoardContext(boards: TrelloBoard[]): string {
     if (!boards || boards.length === 0) {
       return "No boards available.";
@@ -288,7 +264,6 @@ Board ${idx + 1}: "${board.name}"
 - Total Lists: ${totalLists}
 - Total Cards: ${totalCards}`;
 
-        // Add list details
         if (board.lists && board.lists.length > 0) {
           boardInfo += `\n\nLists:`;
           board.lists.forEach((list, listIdx) => {
@@ -296,7 +271,6 @@ Board ${idx + 1}: "${board.name}"
               list.cards?.length || 0
             } cards)`;
 
-            // Add card details
             if (list.cards && list.cards.length > 0) {
               boardInfo += `\n     Cards:`;
               list.cards.forEach((card, cardIdx) => {
@@ -321,9 +295,6 @@ Board ${idx + 1}: "${board.name}"
       .join("\n\n---\n");
   },
 
-  /**
-   * Generate quick insights about boards
-   */
   generateInsights(boards: TrelloBoard[]): string {
     const totalBoards = boards.length;
     const totalCards = boards.reduce(
